@@ -190,6 +190,9 @@ namespace RuntimeGizmos
 		{
 			if(mainTargetRoot == null || manuallyHandleGizmo) return;
 
+      if (lineMaterial == null) {
+        return;
+      }
 			lineMaterial.SetPass(0);
 
 			Color xColor = (nearAxis == Axis.X) ? (isTransforming) ? selectedColor : hoverColor : this.xColor;
