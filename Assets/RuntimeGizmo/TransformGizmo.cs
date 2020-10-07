@@ -1421,5 +1421,9 @@ namespace RuntimeGizmos
 				outlineMaterial = new Material(Shader.Find("Custom/Outline"));
 			}
 		}
+
+    public List<Transform> getTargetRootsOrdered() {
+      return targetRootsOrdered;
+    }
 	}
 }
