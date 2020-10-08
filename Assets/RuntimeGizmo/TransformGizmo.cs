@@ -452,7 +452,13 @@ namespace RuntimeGizmos
 						{
 							Transform target = targetRootsOrdered[i];
 
-							target.Translate(movement, Space.World);
+              Rigidbody targetRigidBody = target.GetComponent<Rigidbody>();
+              // If rigidbody exist, take into account physics on Movement
+              if (targetRigidBody != null) {
+                MovePositionUntilHit((target.position + movement), targetRigidBody);                  
+              } else {
+                target.Translate(movement, Space.World);
+              }
 						}
 
 						SetPivotPointOffset(movement);
@@ -674,7 +680,14 @@ namespace RuntimeGizmos
 
 				if(addCommand) UndoRedoManager.Insert(new AddTargetCommand(this, target, targetRootsOrdered));
 
-				AddTargetRoot(target);
+        Rigidbody targetRigidBody = target.GetComponent<Rigidbody>();
+        // If rigidbody exist, take into account physics on Movement and unfreeze
+        if (targetRigidBody != null) {
+          targetRigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+          targetRigidBody.isKinematic = false;
+        }
+
+        AddTargetRoot(target);
 				AddTargetHighlightedRenderers(target);
 
 				SetPivotPoint();
@@ -689,7 +702,14 @@ namespace RuntimeGizmos
 
 				if(addCommand) UndoRedoManager.Insert(new RemoveTargetCommand(this, target));
 
-				RemoveTargetHighlightedRenderers(target);
+        Rigidbody targetRigidBody = target.GetComponent<Rigidbody>();
+        // If rigidbody exist, take into account physics on Movement and Freezee
+        if (targetRigidBody != null) {
+          targetRigidBody.constraints = RigidbodyConstraints.FreezeAll;
+          targetRigidBody.isKinematic = true;
+        }
+
+        RemoveTargetHighlightedRenderers(target);
 				RemoveTargetRoot(target);
 
 				SetPivotPoint();
@@ -702,7 +722,15 @@ namespace RuntimeGizmos
 
 			ClearAllHighlightedRenderers();
 			targetRoots.Clear();
-			targetRootsOrdered.Clear();
+      for (int i = 0; i < targetRootsOrdered.Count; i++) {
+        Rigidbody targetRigidBody = targetRootsOrdered[i].GetComponent<Rigidbody>();
+        // If rigidbody exist, take into account physics on Movement and Freezee
+        if (targetRigidBody != null) {
+          targetRigidBody.constraints = RigidbodyConstraints.FreezeAll;
+          targetRigidBody.isKinematic = true;
+        }
+      }
+      targetRootsOrdered.Clear();
 			children.Clear();
 		}
 
@@ -1428,5 +1456,43 @@ namespace RuntimeGizmos
     public List<Transform> getTargetRootsOrdered() {
       return targetRootsOrdered;
     }
-	}
+
+    void MovePositionUntilHit(Vector3 desiredPosition, Rigidbody rigidbody)
+    {
+      bool collisionsFound = AreCollisionsInDesiredPosition(desiredPosition, rigidbody);
+      Vector3 currentPosition = rigidbody.transform.position;
+      Vector3 direction = desiredPosition - currentPosition;
+      Ray ray = new Ray(currentPosition, direction);
+      RaycastHit hit;
+      // if (!Physics.Raycast(ray, out hit, direction.magnitude)) {
+      rigidbody.MovePosition(desiredPosition);
+     // } else { 
+      //  rigidbody.MovePosition(hit.point);
+     // }
+    }
+
+    bool AreCollisionsInDesiredPosition(Vector3 desiredPosition, Rigidbody rigidbody)
+    {
+      //Use the OverlapBox to detect if there are any other colliders within this box area.
+      //Use the GameObject's centre, half the size (as a radius) and rotation. This creates an invisible box around your GameObject.
+      Collider[] hitColliders = Physics.OverlapBox(rigidbody.transform.position, rigidbody.transform.localScale / 2, Quaternion.identity, 0);
+      int i = 0;
+
+      //Check when there is a new collider coming into contact with the box
+      while (i < hitColliders.Length) {
+        //Output all of the collider names
+        Debug.Log("Hit : " + hitColliders[i].name + i);
+        //Increase the number of Colliders in the array
+        i++;
+      }
+
+      if (hitColliders.Length > 0) {
+        return true;
+      }
+
+      return false;
+    }
+
+
+  }
 }
