@@ -188,6 +188,9 @@ namespace RuntimeGizmos
 
 		void OnPostRender()
 		{
+      // No dibujar si esta pulsado el boton izquierdo del raton
+      if (Input.GetMouseButton(0)) return;
+
 			if(mainTargetRoot == null || manuallyHandleGizmo) return;
 
       if (lineMaterial == null) {
