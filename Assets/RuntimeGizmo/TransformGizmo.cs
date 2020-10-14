@@ -726,11 +726,13 @@ namespace RuntimeGizmos
 			ClearAllHighlightedRenderers();
 			targetRoots.Clear();
       for (int i = 0; i < targetRootsOrdered.Count; i++) {
-        Rigidbody targetRigidBody = targetRootsOrdered[i].GetComponent<Rigidbody>();
-        // If rigidbody exist, take into account physics on Movement and Freezee
-        if (targetRigidBody != null) {
-          targetRigidBody.constraints = RigidbodyConstraints.FreezeAll;
-          targetRigidBody.isKinematic = true;
+        if (targetRootsOrdered[i] != null) {
+          Rigidbody targetRigidBody = targetRootsOrdered[i].GetComponent<Rigidbody>();
+          // If rigidbody exist, take into account physics on Movement and Freezee
+          if (targetRigidBody != null) {
+            targetRigidBody.constraints = RigidbodyConstraints.FreezeAll;
+            targetRigidBody.isKinematic = true;
+          }
         }
       }
       targetRootsOrdered.Clear();
