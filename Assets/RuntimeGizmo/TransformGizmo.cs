@@ -390,8 +390,15 @@ namespace RuntimeGizmos
 				transformCommands.Add(new TransformCommand(this, targetRootsOrdered[i]));
 			}
 
+      // Guardo la posicion inicial para poder retornar en los siguientes movimientos
+      List<Transform> initialTransforms = new List<Transform>(); 
+      for (int i = 0; i < targetRootsOrdered.Count; i++) {
+        initialTransforms.Add(targetRootsOrdered[i]);
+      }
+
 			while(!Input.GetMouseButtonUp(0))
 			{
+
 				Ray mouseRay = myCamera.ScreenPointToRay(Input.mousePosition);
 				Vector3 mousePosition = Geometry.LinePlaneIntersect(mouseRay.origin, mouseRay.direction, originalPivot, planeNormal);
 				bool isSnapping = Input.GetKey(translationSnapping);
@@ -458,7 +465,7 @@ namespace RuntimeGizmos
               Rigidbody targetRigidBody = target.GetComponent<Rigidbody>();
               // If rigidbody exist, take into account physics on Movement
               if (targetRigidBody != null) {
-                MovePositionUntilHit((target.position + movement), targetRigidBody);                  
+                targetRigidBody.MovePosition(target.position + movement);
               } else {
                 target.Translate(movement, Space.World);
               }
@@ -1462,6 +1469,7 @@ namespace RuntimeGizmos
       return targetRootsOrdered;
     }
 
+    // Lo dejo por si acaso, pero no se usa y se podria borrar
     void MovePositionUntilHit(Vector3 desiredPosition, Rigidbody rigidbody)
     {
       bool collisionsFound = AreCollisionsInDesiredPosition(desiredPosition, rigidbody);
@@ -1476,6 +1484,7 @@ namespace RuntimeGizmos
      // }
     }
 
+    // Lo dejo por si acaso, pero no se usa y se podria borrar
     bool AreCollisionsInDesiredPosition(Vector3 desiredPosition, Rigidbody rigidbody)
     {
       //Use the OverlapBox to detect if there are any other colliders within this box area.
