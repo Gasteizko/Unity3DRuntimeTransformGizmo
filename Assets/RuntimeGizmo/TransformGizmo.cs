@@ -1476,7 +1476,7 @@ namespace RuntimeGizmos
       Vector3 currentPosition = rigidbody.transform.position;
       Vector3 direction = desiredPosition - currentPosition;
       Ray ray = new Ray(currentPosition, direction);
-      RaycastHit hit;
+      // RaycastHit hit;
       // if (!Physics.Raycast(ray, out hit, direction.magnitude)) {
       rigidbody.MovePosition(desiredPosition);
      // } else { 
