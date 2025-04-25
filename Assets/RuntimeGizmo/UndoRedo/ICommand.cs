@@ -2,9 +2,9 @@ using System;
 
 namespace CommandUndoRedo
 {
-	public interface ICommand
-	{
-		void Execute();
-		void UnExecute();
-	}
+    public interface ICommand
+    {
+        void Execute();
+        void UnExecute();
+    }
 }
