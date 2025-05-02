@@ -1,5 +1,3 @@
-using System;
-
 namespace CommandUndoRedo
 {
     public interface ICommand

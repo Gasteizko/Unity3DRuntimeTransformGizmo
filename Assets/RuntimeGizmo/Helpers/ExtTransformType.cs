@@ -1,5 +1,3 @@
-using System;
-
 namespace RuntimeGizmos
 {
     public static class ExtTransformType

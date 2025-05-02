@@ -1,4 +1,3 @@
-using System;
 using CommandUndoRedo;
 using UnityEngine;
 using System.Collections.Generic;
