@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using CommandUndoRedo;
+using UnityEngine.Rendering;
 
 namespace RuntimeGizmos
 {
@@ -137,6 +138,7 @@ namespace RuntimeGizmos
         void OnEnable()
         {
             forceUpdatePivotCoroutine = StartCoroutine(ForceUpdatePivotPointAtEndOfFrame());
+            RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
         }
 
         void OnDisable()
@@ -144,6 +146,8 @@ namespace RuntimeGizmos
             ClearTargets(); //Just so things gets cleaned up, such as removing any materials we placed on objects.
 
             StopCoroutine(forceUpdatePivotCoroutine);
+
+            RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         }
 
         void OnDestroy()
@@ -192,15 +196,26 @@ namespace RuntimeGizmos
 
         void OnPostRender()
         {
+            DrawGizmos();
+        }
+
+        void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera != myCamera) return;
+
+            DrawGizmos();
+        }
+
+
+        void DrawGizmos()
+        {
             // No dibujar si esta pulsado el boton izquierdo del raton
             if (Input.GetMouseButton(0)) return;
 
             if (mainTargetRoot == null || manuallyHandleGizmo) return;
 
-            if (lineMaterial == null)
-            {
-                return;
-            }
+            if (lineMaterial == null) return;
+
             lineMaterial.SetPass(0);
 
             Color xColor = (nearAxis == Axis.X) ? (isTransforming) ? selectedColor : hoverColor : this.xColor;
@@ -233,7 +248,6 @@ namespace RuntimeGizmos
             DrawQuads(circlesLines.y, GetColor(TransformType.Rotate, this.yColor, yColor));
             DrawQuads(circlesLines.z, GetColor(TransformType.Rotate, this.zColor, zColor));
         }
-
         Color GetColor(TransformType type, Color normalColor, Color nearColor, bool forceUseNormal = false)
         {
             return GetColor(type, normalColor, nearColor, false, 1, forceUseNormal);
@@ -1484,8 +1498,8 @@ namespace RuntimeGizmos
         {
             if (lineMaterial == null)
             {
-                lineMaterial = new Material(Shader.Find("Custom/Lines"));
-                outlineMaterial = new Material(Shader.Find("Custom/Outline"));
+                lineMaterial = new Material(Shader.Find("Custom/LinesURP"));
+                outlineMaterial = new Material(Shader.Find("Custom/OutlineURP"));
             }
         }
 
